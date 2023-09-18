@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="zh-CN" theme-mode="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>导入表 | 雨墨旅</title><link rel="icon" type="image/x-icon" href="/favicon.ico"><script>var config = {"root":"/","search":{"preload":false,"activeHolder":"键入以继续","blurHolder":"数据检索","noResult":"无 $0 相关数据"},"code":{"codeInfo":"$0 - 共 $1 行","copy":"复制","copyFinish":"复制成功","expand":"展开"}}</script><script src="//unpkg.com/mermaid@9.2.2/dist/mermaid.min.js"></script><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lightgallery.css"><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lg-zoom.css"><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lg-thumbnail.css"><link rel="stylesheet" href="/css/arknights.css"><script>if (window.localStorage.getItem('theme-mode') === 'light') document.documentElement.setAttribute('theme-mode', 'light')
+if (window.localStorage.getItem('theme-mode') === 'dark') document.documentElement.setAttribute('theme-mode', 'dark')</script><style>@font-face {
+ font-family: BenderLight;
+ src: local('Bender'), url("/font/BenderLight.ttf");
+}
+@font-face {
+ font-family: 'JetBrains Mono';
+ src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}</style><meta name="generator" content="Hexo 6.3.0"></head><body><div class="loading" style="opacity: 0"><div class="loadingBar left"></div><div class="loadingBar right"></div></div><main><header class="closed"><nav><div class="navBtn hide"><i class="navBtnIcon"><span class="navBtnIconBar"></span><span class="navBtnIconBar"></span><span class="navBtnIconBar"></span></i></div><div class="navItem" id="search-header"><span class="navItemTitle"><input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="数据检索" spellcheck="false" maxlength="50" type="text" id="search-input"></span></div><div class="navItem" id="search-holder"></div><div class="search-popup"><div id="search-result"></div></div><ol class="navContent"><li class="navItem"><a class="navBlock" href="/"><span class="navItemTitle">Home</span></a></li><li class="navItem" matchdata="categories,tags"><a class="navBlock" href="/archives/"><span class="navItemTitle">Archives</span></a></li></ol></nav></header><article><div id="post-bg"><div id="post-title"><h1>导入表</h1><div id="post-info"><span>文章发布时间: <div class="control"><time datetime="2023-07-10T08:11:06.000Z" id="date"> 2023-07-10</time></div></span><br><span>最后更新时间: <div class="control"><time datetime="2023-07-13T08:44:43.039Z" id="updated"> 2023-07-13</time></div></span></div></div><hr><div id="post-content"><p>​		本篇文章以《Windows PE权威指南》作为基础进行学习，结合自己的学习和理解写本篇博客。如有错误或更好的见解欢迎指出。</p>
+<h1 id="导入表"><a href="#导入表" class="headerlink" title="导入表"></a>导入表</h1><h2 id="PE中的导入表"><a href="#PE中的导入表" class="headerlink" title="PE中的导入表"></a>PE中的导入表</h2><h3 id="PE导入表的定位"><a href="#PE导入表的定位" class="headerlink" title="PE导入表的定位"></a>PE导入表的定位</h3><p>以书附赠的代码HelloWorld.exe为例</p>
+<h4 id="数据目录项IMAGE-DATA-DIRECTORY"><a href="#数据目录项IMAGE-DATA-DIRECTORY" class="headerlink" title="数据目录项IMAGE_DATA_DIRECTORY"></a>数据目录项IMAGE_DATA_DIRECTORY</h4><p>数据目录项于PE头标识的偏移量是<strong>78h</strong>,我们可以计算出数据目录项的起始位置在<strong>128h</strong>地址处</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710172138729.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710172138729.png" alt="image-20230710172138729"></p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710172924720.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710172924720.png" alt="image-20230710172924720"></p>
+<p>根据数据目录项结构体和其描述可以知道，在<strong>130h</strong>处是导入表地址和大小，在<strong>1B8h</strong>处是导入函数地址表地址和大小。</p>
+<p>从PE头中可以读出导入表地址是<strong>0x00002010</strong>，导入表的大小是<strong>3Ch</strong>。导入函数地址表地址是<strong>0x00002000</strong>，导入函数地址表大小是<strong>10h</strong>。</p>
+<h4 id="节表项IMAGE-SECTION-HEADER"><a href="#节表项IMAGE-SECTION-HEADER" class="headerlink" title="节表项IMAGE_SECTION_HEADER"></a>节表项IMAGE_SECTION_HEADER</h4><p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710174031969.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710174031969.png" alt="image-20230710174031969"></p>
+<p>在数据目录项后紧跟的是节表项，根据节表项结构体我们可以读出这些信息。</p>
+<p>.rdata节区的尺寸是<strong>92h</strong>，节区的RVA地址是<strong>0x00002000</strong>，在文件中的偏移是<strong>0200h</strong>，在文件中的偏移是<strong>0600h</strong>。</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710173629323.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710173629323.png"></p>
+<h4 id="导入表定位"><a href="#导入表定位" class="headerlink" title="导入表定位"></a>导入表定位</h4><p>根据获得的.rdata节区的数据可以知道，导入表和导入函数地址表位于该节区内，由此可以计算出对应的文件内偏移。导入表：<strong>0610h</strong>,导入函数地址表：<strong>0600h</strong>。</p>
+<h3 id="导入表描述符IMAGE-IMPORT-DESCRIPTOR"><a href="#导入表描述符IMAGE-IMPORT-DESCRIPTOR" class="headerlink" title="导入表描述符IMAGE_IMPORT_DESCRIPTOR"></a>导入表描述符IMAGE_IMPORT_DESCRIPTOR</h3><p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710181711101.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710181711101.png" alt="image-20230710181711101"></p>
+<p>根据导入表描述符结构体我们可以获得其中一个导入表这些信息,桥1<strong>0x00002054h</strong>，时间戳&amp;链表的前一个结构<strong>00000000</strong>，指向链接库名字的指针<strong>0x0000206A</strong>，桥2  <strong>0x00002008</strong>。</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710194648814.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710194648814.png" alt="image-20230710194648814"></p>
+<h3 id="导入表双桥结构"><a href="#导入表双桥结构" class="headerlink" title="导入表双桥结构"></a>导入表双桥结构</h3><p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710195648917.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710195648917.png" alt="image-20230710195648917"></p>
+<p>桥1简写INT（import name table，不准确），导入函数名称表；桥2简写IAT（import address table，不准确），导入函数地址表。</p>
+<p>INT的第一个字段（好像只有一个字段）指向的是IMAGE_IMPORT_BY_NAME，然后是下一个导入函数的IMAGE_IMPORT_BY_NAME地址，然后是00000000h的结束标识符。</p>
+<h4 id="IMAGE-IMPORT-BY-NAME"><a href="#IMAGE-IMPORT-BY-NAME" class="headerlink" title="IMAGE_IMPORT_BY_NAME"></a>IMAGE_IMPORT_BY_NAME</h4><p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710200740577.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710200740577.png" alt="image-20230710200740577"></p>
+<p>这个结构体中只有两个成员，第一个是函数编号，第二个是函数名称字符串比如MessageBox。在这个信息结束后紧跟着的是该函数所在动态链接库的名称。</p>
+<p>桥2所指的内容目前来说和桥1所指相同。</p>
+<p>导入表的给出的每一块信息是一个DLL文件的相关信息，从INT、IAT到IMAGE_IMPORT_BY_NAME，都是以一个DLL文件整体导入的内容为模块来划分结束标识。</p>
+<h3 id="在内存中的导入表"><a href="#在内存中的导入表" class="headerlink" title="在内存中的导入表"></a>在内存中的导入表</h3><p>在内存中导入表和文件中的除了IAT外没有任何不同。程序在加载如内存时，操作系统会将IAT指向的地址改为导入函数的入口地址。</p>
+<h3 id="同一个DLL文件中的多个函数导入表"><a href="#同一个DLL文件中的多个函数导入表" class="headerlink" title="同一个DLL文件中的多个函数导入表"></a>同一个DLL文件中的多个函数导入表</h3><p>前面关于双桥结构的内容都是基于本小节编写的。这里主要以指出其中的不同为重点。代码采用的是本书的LockTray.exe</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710203029811.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710203029811.png" alt="image-20230710203029811"></p>
+<p>INT的地址为65Ch，内容为”<strong>0x0000208A,0x0000207C,0x0000206C,0x00000000</strong>“。对应的内容从66Ch开始，对应的英文内容分别是“<strong>00ABh,EnableWindow;00C8h,FindWindowA;022Dh,ShowWindow</strong>”。在这个IMAGE_IMPORT_BY_NAME结构后是对应这个DLL文件的名称“<strong>user32.dll</strong>”。</p>
+<p>然后是LockTray.exe在文件中与内存中的示意图。</p>
+<p>在文件中的示意图</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710205116681.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710205116681.png" alt="image-20230710205116681"></p>
+<p>在内存中的示意图</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710205019707.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230710205019707.png" alt="image-20230710205019707"></p>
+<h3 id="本小节最后"><a href="#本小节最后" class="headerlink" title="本小节最后"></a>本小节最后</h3><p>至此，PE中的导入表部分就结束了，对应《Windows PE权威指南》的4.3节，关于本章导入表的更多内容正在学习。</p>
+<p>从PE头开始一步一步的定位到导入表和导入函数地址表，相较于对第三章的内容硬看，对于理解PE头部分的内容有不错的效果。</p>
+<p>对于4.1与4.2节的内容，我认为书上的内容，还是比较直白的，通体阅读下来并没有特别难以理解的地方，更多的对他的机制的了解，无需更细的去学。</p>
+<h2 id="绑定导入表"><a href="#绑定导入表" class="headerlink" title="绑定导入表"></a>绑定导入表</h2><h3 id="绑定导入表的机制"><a href="#绑定导入表的机制" class="headerlink" title="绑定导入表的机制"></a>绑定导入表的机制</h3><p>这一段内容书上对于相关机制的介绍十分详细，这里只做见到的总结，便于理解。</p>
+<p>在“内存中的导入表”提到过在程序加载进内存的过程中，系统会将IAT指向的地址改为内存中导入函数的地址，这个过程会消耗一定的时间，如果提前做好这些工作就可以节省一些时间。绑定导入表的作用就是将已经提前修改好的导入表内容进行声明，这样就可以不做这部分工作了。</p>
+<p>需要注意的是不同的操作系统，DLL文件加载进入内存空间的地址是不一样的。在加载动态链接库时会检查这些地址是否合法，如果当前DLL文件的版本号和文件中的DLL版本号不同，则会重新进行IAT的修改工作，并将修改的记录保存在文件中。</p>
+<p>此外有些情况是没有桥1 INT这个结构的，那么这将导致无法完整绑定导入这个工作。在进行检查DLL版本问题时，因为在文件中INT和IAT是完全相同的，我们可以通过同时遍历两个表来确定每一个导入函数的对应内存中的地址，来进行检查。</p>
+<h3 id="绑定导入表的定位"><a href="#绑定导入表的定位" class="headerlink" title="绑定导入表的定位"></a>绑定导入表的定位</h3><p>以随书附赠的notepad.exe的程序为例。</p>
+<p>根据根据数据目录项的第12个可以得知绑定导入表的地址事“<strong>0x00000250</strong>”，大小为”<strong>0Ch</strong>“</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230712223328175.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230712223328175.png" alt="image-20230712223328175"></p>
+<h3 id="绑定导入表的数据结构"><a href="#绑定导入表的数据结构" class="headerlink" title="绑定导入表的数据结构"></a>绑定导入表的数据结构</h3><p>从<strong>0x250</strong>开始便是绑定导入表相关的内容。</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230713134123079.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230713134123079.png" alt="image-20230713134123079"></p>
+<p>我们从第一个来开始看“<strong>A2BD0248h</strong>”是时间戳，就是用来标志DLL文件版本与本机的版本是否相同的一个标识，然后是”<strong>0058h</strong>“这个指向DLL文件名称，这里的值是一个偏移量，相对于绑定导入表头的一个偏移量，根据计算我们可以得到指向DLL文件名称的地址“<strong>0250h+0058h&#x3D;02A8h</strong>”，根据这个地址我可以得知这里指向的DLL文件名称是“<strong>comdlg32.dll</strong>”。</p>
+<p>第三个字段的用处是用来指出紧跟着IMAGE_BOUND_IMPORT_DESCRIPTOR后面另一个结构体IMAGE_BOUND_FORWARDER_REF的个数。</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230713135559840.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230713135559840.png" alt="image-20230713135559840"></p>
+<p>这个字段的设计意义是微软为了能够兼容不同版本DLL中同一函数在另一函数库中的情况。IMAGE_BOUND_FORWARDER_REF这个结构体的字段意义同IMAGE_BOUND_IMPORT_DESCRIPTOR一样，只是最后一个字段变为了保留字段。</p>
+<p>根据<strong>0x280</strong>这个IMAGE_BOUND_IMPORT_DESCRIPTOR来进行分析。首先时间戳“<strong>4802BDC6h</strong>”，然后是偏移量“<strong>00A3h</strong>”，然后是IMAGE_BOUND_FORWARDER_REF个数“<strong>0001h</strong>”，紧接着的就是“REF”这个结构体；时间戳是“<strong>4802BDC5h</strong>”，然后是偏移量“<strong>00B0h</strong>”。第一个偏移量指的是“<strong>0x2F3</strong>”这个地址“<strong>KERNEL32.dll</strong>”，第二个偏移量指的是“<strong>0x300</strong>”这个地址“<strong>NTDLL.DLL</strong>”。</p>
+<p class='item-img' data-src='/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230712223936318.png'><img src="/2023/07/10/%E5%AF%BC%E5%85%A5%E8%A1%A8/image-20230712223936318.png" alt="image-20230712223936318"></p>
+<h4 id="关于IMAGE-BOUND-FORWARDER-REF"><a href="#关于IMAGE-BOUND-FORWARDER-REF" class="headerlink" title="关于IMAGE_BOUND_FORWARDER_REF"></a>关于IMAGE_BOUND_FORWARDER_REF</h4><p>我通过询问CHATGPT后得到他关于这个字段是模块转发机制，他的机制是这样的。</p>
+<p>模块转发是一种动态链接库（DLL）加载和解析的机制，用于解决模块间的依赖关系和版本兼容性问题。当一个模块需要引用另一个模块的函数或符号时，而不直接依赖于特定的模块版本，模块转发提供了一种灵活的方式来实现这种依赖关系。</p>
+<p>下面是模块转发的基本机制：</p>
+<ol>
+<li><p>源模块（调用模块）：这是需要引用其他模块功能的模块，它包含对函数或符号的导入请求。源模块将导入请求发送到绑定导入表中。</p>
+</li>
+<li><p>绑定导入表（Bound Import Table）：绑定导入表是源模块的一部分，其中记录了导入请求的相关信息。在绑定导入表中，源模块指定了需要从其他模块解析的函数或符号。</p>
+</li>
+<li><p>转发目标模块：转发目标模块是源模块将导入请求转发给的模块。它包含了源模块所需的函数或符号的实现。转发目标模块通常是另一个独立的DLL，它被源模块作为依赖模块进行引用。</p>
+</li>
+<li><p>运行时解析：当源模块被加载时，系统会检查绑定导入表中的转发信息。系统将导入请求转发到转发目标模块，即转发目标模块负责提供对应的函数或符号的实现。</p>
+</li>
+<li><p>符号解析：在转发目标模块中，系统会解析源模块的导入请求，并提供对应函数或符号的实现。解析后的函数或符号会被返回给源模块，使得源模块可以调用转发目标模块的功能。</p>
+</li>
+</ol>
+<p>通过模块转发，源模块可以将对其他模块的依赖关系委托给转发目标模块，从而实现对外部功能的访问或共享。这种机制提供了灵活性，使得模块之间可以相对独立地开发和维护，同时解决了依赖关系和版本兼容性的问题。</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>需要注意的是，模块转发的具体实现和用法可能因操作系统、编译器和应用程序的不同而有所差异。这种机制的设计旨在提供一种可扩展和灵活的方式来管理模块间的关系。</p>
+<p>他这个字段是导入函数转发声明，当源模块被加载时，会检查导入表中的转发信息，向转发模块对需要的函数或符号进行解析。</p>
+<p>原模块中不含有需要解析的函数或符号的实现。</p>
+<h3 id="本小节最后-1"><a href="#本小节最后-1" class="headerlink" title="本小节最后"></a>本小节最后</h3><p>绑定导入表的内容相对较少，大概做个了解，理解绑定导入的机制即可。</p>
+<p>如果有问题可以通过邮箱联系我“<a href="mailto:&#114;&#97;&#105;&#x6e;&#105;&#110;&#107;&#x74;&#114;&#x69;&#112;&#64;&#102;&#111;&#120;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#111;&#109;">&#114;&#97;&#105;&#x6e;&#105;&#110;&#107;&#x74;&#114;&#x69;&#112;&#64;&#102;&#111;&#120;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#111;&#109;</a>”。</p>
+<div id="paginator"></div></div><div id="post-footer"><div id="pages"><div class="footer-link" style="width: 50%;text-align:right;border-right:1px #fe2 solid"><a href="/2023/07/28/%E5%AF%BC%E5%87%BA%E8%A1%A8/">← Next 导出表</a></div><div class="footer-link" style="width: 50%;right:1px;border-left:1px #fe2 solid"><a href="/2023/07/10/base64%E7%9A%84C%E8%AF%AD%E8%A8%80%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%8E%9F%E7%90%86/">base64的C语言实现及原理 Prev →</a></div></div></div></div><div class="bottom-btn"><div><a id="to-top" onClick="scrolls.scrolltop();" title="回到顶部" style="opacity: 0; display: none;">∧</a><a id="to-index" href="#toc-div" title="文章目录">≡</a><a id="color-mode" onClick="colorMode.change()" title="切换主题"></a></div></div></article><aside><div id="about"><a href="/" id="logo"><img src="https://ak.hypergryph.com/assets/index/images/ak/pc/faction/1.png" alt="Logo"></a><h1 id="Dr"><a href="/">Rain_ink_trip</a></h1><div id="description"><p></p></div></div><div id="aside-block"><div id="toc-div"><h1>目录</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%BC%E5%85%A5%E8%A1%A8"><span class="toc-number">1.</span> <span class="toc-text">导入表</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PE%E4%B8%AD%E7%9A%84%E5%AF%BC%E5%85%A5%E8%A1%A8"><span class="toc-number">1.1.</span> <span class="toc-text">PE中的导入表</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PE%E5%AF%BC%E5%85%A5%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.1.1.</span> <span class="toc-text">PE导入表的定位</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%9B%AE%E5%BD%95%E9%A1%B9IMAGE-DATA-DIRECTORY"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">数据目录项IMAGE_DATA_DIRECTORY</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8A%82%E8%A1%A8%E9%A1%B9IMAGE-SECTION-HEADER"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">节表项IMAGE_SECTION_HEADER</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BC%E5%85%A5%E8%A1%A8%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">导入表定位</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BC%E5%85%A5%E8%A1%A8%E6%8F%8F%E8%BF%B0%E7%AC%A6IMAGE-IMPORT-DESCRIPTOR"><span class="toc-number">1.1.2.</span> <span class="toc-text">导入表描述符IMAGE_IMPORT_DESCRIPTOR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BC%E5%85%A5%E8%A1%A8%E5%8F%8C%E6%A1%A5%E7%BB%93%E6%9E%84"><span class="toc-number">1.1.3.</span> <span class="toc-text">导入表双桥结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IMAGE-IMPORT-BY-NAME"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">IMAGE_IMPORT_BY_NAME</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AF%BC%E5%85%A5%E8%A1%A8"><span class="toc-number">1.1.4.</span> <span class="toc-text">在内存中的导入表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E4%B8%80%E4%B8%AADLL%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E5%AF%BC%E5%85%A5%E8%A1%A8"><span class="toc-number">1.1.5.</span> <span class="toc-text">同一个DLL文件中的多个函数导入表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AC%E5%B0%8F%E8%8A%82%E6%9C%80%E5%90%8E"><span class="toc-number">1.1.6.</span> <span class="toc-text">本小节最后</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%91%E5%AE%9A%E5%AF%BC%E5%85%A5%E8%A1%A8"><span class="toc-number">1.2.</span> <span class="toc-text">绑定导入表</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%91%E5%AE%9A%E5%AF%BC%E5%85%A5%E8%A1%A8%E7%9A%84%E6%9C%BA%E5%88%B6"><span class="toc-number">1.2.1.</span> <span class="toc-text">绑定导入表的机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%91%E5%AE%9A%E5%AF%BC%E5%85%A5%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.2.2.</span> <span class="toc-text">绑定导入表的定位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%91%E5%AE%9A%E5%AF%BC%E5%85%A5%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.3.</span> <span class="toc-text">绑定导入表的数据结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E4%BA%8EIMAGE-BOUND-FORWARDER-REF"><span class="toc-number">1.2.3.1.</span> <span class="toc-text">关于IMAGE_BOUND_FORWARDER_REF</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.2.3.1.1.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AC%E5%B0%8F%E8%8A%82%E6%9C%80%E5%90%8E-1"><span class="toc-number">1.2.4.</span> <span class="toc-text">本小节最后</span></a></li></ol></li></ol></li></ol></div></div><footer><nobr>构建自 <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></nobr><wbr><nobr> 使用主题 <a target="_blank" rel="noopener" href="https://github.com/Yue-plus/hexo-theme-arknights">Arknights</a></nobr><wbr><nobr>主题作者 <a target="_blank" rel="noopener" href="https://github.com/Yue-plus">Yue_plus</a></nobr></footer></aside></main><canvas id="canvas-dust"></canvas><script src="//js/search.js"></script><script src="/js/arknights.js"></script><script src="//unpkg.com/lightgallery@2.7.1/lightgallery.min.js"></script><script src="//unpkg.com/lightgallery@2.7.1/plugins/zoom/lg-zoom.min.js"></script><script src="//unpkg.com/lightgallery@2.7.1/plugins/thumbnail/lg-thumbnail.min.js"></script><script src="/js/pjax.js"></script><script class="pjax-js">reset= () => {code.findCode();
+document.querySelector('.lg-container')?.remove()
+lightGallery(document.getElementById('post-bg'), {
+  plugins: [lgZoom,lgThumbnail],
+  selector: '.item-img'})}</script><script>window.addEventListener("load",() => {pjax = new Pjax({
+ cacheBust: false,
+ selectors: ['title','article','#aside-block','.pjax-js'],
+ switches: {'article': Pjax.switches.sideBySide},
+ switchesOptions: {
+   'article': {
+     classNames: {
+       remove: "pjax-out",
+       add: "pjax-in"
+     }
+   }
+ }
+});
+document.addEventListener("pjax:complete", reset);reset()})</script></body></html>
